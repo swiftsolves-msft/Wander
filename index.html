@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#c9a227">
+  <title>Wander — Desert Survival</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="hud">
+      <div class="hud-brand">
+        <span class="sun-icon" aria-hidden="true">☀</span>
+        <div>
+          <h1>Wander</h1>
+          <p class="level-label" id="level-label">Level 1 — The Dunes</p>
+        </div>
+      </div>
+      <div class="hud-stats">
+        <div class="hud-stat" title="Hydration">
+          <span class="hud-stat-icon">💧</span>
+          <div class="meter">
+            <div class="meter-fill hydration-fill" id="hydration-fill"></div>
+          </div>
+          <span class="hud-stat-value" id="hydration-value">10</span>
+        </div>
+        <div class="hud-stat" title="Gold">
+          <span class="hud-stat-icon">🪙</span>
+          <span class="hud-stat-value" id="gold-value">0</span>
+        </div>
+        <div class="hud-stat" title="Score">
+          <span class="hud-stat-icon">⭐</span>
+          <span class="hud-stat-value" id="score-value">0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="board-wrap">
+      <div class="board" id="board" role="grid" aria-label="Desert tile grid"></div>
+    </main>
+
+    <footer class="message-bar" id="message-bar" aria-live="polite">
+      Tap a tile to explore the desert. Avoid snakes and scorpions.
+    </footer>
+  </div>
+
+  <div class="overlay" id="start-overlay">
+    <div class="modal">
+      <h2>Level 1 — The Dunes</h2>
+      <p>Explore the desert tile by tile. Each step costs hydration. Find gold, oasis water, and the wandering trader — but beware snakes and scorpions.</p>
+      <ul class="modal-rules">
+        <li>💧 Hydration starts at <strong>10</strong></li>
+        <li>🐍 Snakes &amp; scorpions end your run</li>
+        <li>🪙 Trade gold with the trader for water</li>
+        <li>🕳️ Find the cave entrance to advance</li>
+      </ul>
+      <button class="btn btn-primary" id="start-btn">Begin</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="trader-overlay">
+    <div class="modal">
+      <h2>🧳 Wandering Trader</h2>
+      <p>"Gold for water, traveler? A fair trade in this heat."</p>
+      <p class="trade-info">1 gold → +3 hydration</p>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="trade-btn">Trade (1 🪙)</button>
+        <button class="btn btn-secondary" id="trade-close-btn">Leave</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="end-overlay">
+    <div class="modal">
+      <h2 id="end-title">Journey's End</h2>
+      <p id="end-message"></p>
+      <p class="end-score" id="end-score"></p>
+      <button class="btn btn-primary" id="restart-btn">Play Again</button>
+    </div>
+  </div>
+
+  <script src="js/levels/level1.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
