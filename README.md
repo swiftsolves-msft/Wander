@@ -52,7 +52,16 @@ This repo uses **Azure Static Web Apps** with GitHub Actions.
 
 ### Continuous deployment
 
-Every push to `main` triggers `.github/workflows/azure-static-web-apps.yml` and deploys the static files.
+The workflow `.github/workflows/azure-static-web-apps.yml` deploys automatically:
+
+| Trigger | What happens |
+|---|---|
+| **PR merged to `main`** | Validates game files, then deploys to **production** |
+| **Push directly to `main`** | Same production deploy |
+| **Open PR** | Deploys a temporary **preview** environment |
+| **Manual** | Run **Deploy Wander to Azure** from the Actions tab |
+
+**Required secret:** `AZURE_STATIC_WEB_APPS_API_TOKEN` (added automatically when you link the Static Web App to GitHub).
 
 ## Project Structure
 

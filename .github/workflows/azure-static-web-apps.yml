@@ -1,23 +1,80 @@
-name: Deploy to Azure Static Web Apps
+name: Deploy Wander to Azure
 
 on:
+  # Runs when a PR is merged into main (merge = push to main)
   push:
     branches:
       - main
+
+  # Optional: deploy a staging preview while a PR is open
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
 
+  # Allow manual deploy from the Actions tab
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build_and_deploy:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  validate:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy
+    name: Validate game files
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Azure Static Web Apps
+      - name: Verify required game assets exist
+        run: |
+          set -e
+          test -f index.html
+          test -f css/style.css
+          test -f js/game.js
+          test -f js/levels/level1.js
+          test -f staticwebapp.config.json
+          echo "All game files present."
+
+  deploy_production:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: validate
+    runs-on: ubuntu-latest
+    name: Deploy production (main)
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.static_web_app_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy game to Azure Static Web Apps
+        id: deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /
+          api_location: ''
+          output_location: ''
+          production_branch: main
+
+      - name: Deployment summary
+        run: |
+          echo "Wander game deployed to Azure Static Web Apps."
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+
+  deploy_preview:
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
+    needs: validate
+    runs-on: ubuntu-latest
+    name: Deploy PR preview
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy preview to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
@@ -27,12 +84,12 @@ jobs:
           api_location: ''
           output_location: ''
 
-  close_pull_request:
+  close_preview:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request
+    name: Tear down PR preview
     steps:
-      - name: Close Pull Request
+      - name: Close Azure Static Web Apps preview
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
