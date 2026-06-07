@@ -2,7 +2,9 @@
 
 A mobile-friendly desert survival web game. Explore tile by tile, manage your hydration, and survive all 9 levels.
 
-**Live site:** Deployed to Azure Static Web Apps via GitHub Actions.
+**Live site:** [https://polite-water-0e6f1240f.7.azurestaticapps.net](https://polite-water-0e6f1240f.7.azurestaticapps.net)
+
+Deployed to Azure Static Web Apps via GitHub Actions.
 
 ## Level 1 — The Dunes
 
@@ -61,7 +63,9 @@ The workflow `.github/workflows/azure-static-web-apps.yml` deploys automatically
 | **Open PR** | Deploys a temporary **preview** environment |
 | **Manual** | Run **Deploy Wander to Azure** from the Actions tab |
 
-**Required secret:** `AZURE_STATIC_WEB_APPS_API_TOKEN` (added automatically when you link the Static Web App to GitHub).
+**Required secret:** `AZURE_STATIC_WEB_APPS_API_TOKEN_POLITE_WATER_0E6F1240F` (added automatically when the Static Web App is linked to GitHub).
+
+**Azure resource:** `wander-game` in resource group `rg-swiftsolves` (East US 2).
 
 ## Project Structure
 
