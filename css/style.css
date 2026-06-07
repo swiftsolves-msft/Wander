@@ -193,6 +193,16 @@ body {
   color: var(--text-light);
 }
 
+.tile.cave-enterable {
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(99, 110, 114, 0.6);
+  animation: cave-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cave-pulse {
+  50% { box-shadow: 0 0 16px rgba(99, 110, 114, 0.9); }
+}
+
 .tile.trader {
   background: linear-gradient(145deg, #dfe6e9, #b2bec3);
 }

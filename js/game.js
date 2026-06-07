@@ -80,9 +80,11 @@ const Game = {
       const display = level.getTileDisplay(cell);
       btn.className = `tile ${display.className}`;
       btn.textContent = display.emoji;
-      btn.disabled = state.gameOver || cell.revealed;
+      const isEnterableCave =
+        cell.revealed && cell.terrain === 'cave' && !state.gameOver;
+      btn.disabled = state.gameOver || (cell.revealed && !isEnterableCave);
 
-      if (!cell.revealed && !state.gameOver) {
+      if ((!cell.revealed || isEnterableCave) && !state.gameOver) {
         btn.addEventListener('click', () => this.handleTileClick(index));
       }
 
@@ -102,7 +104,11 @@ const Game = {
 
   handleTileClick(index) {
     const level = this.getLevel();
-    const result = level.revealTile(this.state, index);
+    const cell = this.state.cells[index];
+    const result =
+      cell.revealed && cell.terrain === 'cave'
+        ? level.enterCave(this.state, index)
+        : level.revealTile(this.state, index);
     if (!result) return;
 
     if (result.openTrader) {

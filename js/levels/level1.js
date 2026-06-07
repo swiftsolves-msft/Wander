@@ -174,6 +174,10 @@ const Level1 = {
     state.firstClick = false;
   },
 
+  isFloodable(cell) {
+    return cell.terrain === 'sand' && !cell.traderHere;
+  },
+
   getHiddenIndices(state) {
     return state.cells
       .map((c, i) => (!c.revealed ? i : -1))
@@ -238,19 +242,18 @@ const Level1 = {
       visited.add(current);
 
       const cell = state.cells[current];
-      if (cell.revealed) continue;
+      if (cell.revealed || !this.isFloodable(cell)) continue;
 
       cell.revealed = true;
       state.tilesRevealed++;
       state.score += this.config.scorePerTile;
 
-      if (
-        cell.adjacentDangers === 0 &&
-        cell.terrain === 'sand' &&
-        !cell.traderHere
-      ) {
+      if (cell.adjacentDangers === 0) {
         this.getNeighbors(current, size).forEach((ni) => {
-          if (!state.cells[ni].revealed) queue.push(ni);
+          const neighbor = state.cells[ni];
+          if (!neighbor.revealed && this.isFloodable(neighbor)) {
+            queue.push(ni);
+          }
         });
       }
     }
@@ -312,8 +315,7 @@ const Level1 = {
             result.message = 'A hidden oasis quenches your thirst.';
             break;
           case 'cave':
-            result.won = true;
-            result.message = 'You found the cave entrance! (Level 2 coming soon)';
+            result.message = 'A cave entrance in the rock! Tap it again to enter.';
             break;
           case 'sand':
             result.message =
@@ -332,6 +334,27 @@ const Level1 = {
 
     if (!result.died && !result.won && !result.openTrader) {
       this.moveTrader(state);
+    }
+
+    return result;
+  },
+
+  enterCave(state, index) {
+    const cell = state.cells[index];
+    if (state.gameOver || cell.terrain !== 'cave' || !cell.revealed) return null;
+
+    state.hydration -= this.config.hydrationPerMove;
+
+    const result = {
+      message: 'You descend into the cave... (Level 2 coming soon)',
+      died: false,
+      won: true,
+    };
+
+    if (state.hydration <= 0) {
+      result.died = true;
+      result.won = false;
+      result.message = 'Your canteen runs dry before you reach the cave floor.';
     }
 
     return result;
@@ -367,7 +390,7 @@ const Level1 = {
       case 'oasis':
         return { emoji: '💧', className: 'revealed oasis' };
       case 'cave':
-        return { emoji: '🕳️', className: 'revealed cave' };
+        return { emoji: '🕳️', className: 'revealed cave cave-enterable' };
       default:
         if (cell.adjacentDangers > 0) {
           return {
